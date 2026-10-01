@@ -1,0 +1,10 @@
+# Build output
+build/
+
+# CMake / Qt Creator user files
+CMakeLists.txt.user
+*.user
+
+# Editor / IDE
+.vscode/
+.idea/
