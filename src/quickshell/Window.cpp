@@ -309,6 +309,12 @@ void PanelWindow::setExclusiveZone(qint32 zone)
         return;
     m_exclusiveZone = zone;
     emit exclusiveZoneChanged();
+
+    // setting a zone implies ExclusionMode.Normal
+    if (m_exclusionMode != ExclusionMode::Normal) {
+        m_exclusionMode = ExclusionMode::Normal;
+        emit exclusionModeChanged();
+    }
     updateAppBar();
 }
 
@@ -394,31 +400,55 @@ void PanelWindow::updateGeometry()
     updateAppBar();
 }
 
+static AppBar::Edge appBarEdgeFor(const Anchors &a)
+{
+    // the reserved edge is the lone anchor with nothing opposite it; a zone needs
+    // exactly 1 or 3 anchors, so look for the 3-anchor cases first
+    if (a.top && a.left && a.right)
+        return AppBar::Top;
+    if (a.bottom && a.left && a.right)
+        return AppBar::Bottom;
+    if (a.left && a.top && a.bottom)
+        return AppBar::Left;
+    if (a.right && a.top && a.bottom)
+        return AppBar::Right;
+    if (a.top)
+        return AppBar::Top;
+    if (a.bottom)
+        return AppBar::Bottom;
+    if (a.left)
+        return AppBar::Left;
+    if (a.right)
+        return AppBar::Right;
+    return AppBar::NoEdge;
+}
+
 void PanelWindow::updateAppBar()
 {
-    if (!m_completed || !m_window || !m_window->isVisible()) {
+    if (!m_completed || !m_window || !m_window->isVisible()
+        || m_exclusionMode == ExclusionMode::Ignore) {
         m_appBar.clear();
         return;
     }
 
-    // Ignore mode reserves nothing
-    if (m_exclusionMode == ExclusionMode::Ignore) {
-        m_appBar.clear();
-        return;
-    }
+    const int count = static_cast<int>(m_anchors.top) + static_cast<int>(m_anchors.bottom)
+                    + static_cast<int>(m_anchors.left) + static_cast<int>(m_anchors.right);
 
     AppBar::Edge edge = AppBar::NoEdge;
-    if (m_anchors.top)
-        edge = AppBar::Top;
-    else if (m_anchors.bottom)
-        edge = AppBar::Bottom;
-    else if (m_anchors.left)
-        edge = AppBar::Left;
-    else if (m_anchors.right)
-        edge = AppBar::Right;
+    qint32 thickness = 0;
 
-    // only edges can be app-bars
-    m_appBar.reserveForWindow(m_window, edge, m_exclusiveZone);
+    if (m_exclusionMode == ExclusionMode::Auto) {
+        // reserve the window's own size, only with exactly 3 anchors
+        if (count == 3)
+            edge = appBarEdgeFor(m_anchors);
+    } else { // Normal
+        if ((count == 1 || count == 3) && m_exclusiveZone > 0) {
+            edge = appBarEdgeFor(m_anchors);
+            thickness = m_exclusiveZone;
+        }
+    }
+
+    m_appBar.reserveForWindow(m_window, edge, thickness);
 }
 
 // === FloatingWindow ========================================================

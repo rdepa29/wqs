@@ -203,6 +203,12 @@ does:
   **Windows app-bar** via `SHAppBarMessage`, the same mechanism the taskbar uses,
   so the bar's strip is carved out of the work area independent of the WM
 
+Reservation follows upstream's rules, on all four edges: `exclusionMode: Auto`
+(the default) reserves exactly the window's own size, and only when the panel has
+three anchors. `Normal` reserves `exclusiveZone` and accepts one or three. In
+both cases the anchors pick the edge, so a panel anchored `left, top, bottom`
+reserves the left strip, `top, left, right` reserves the top one, and so on.
+
 The ignore rule lives in komorebi's `applications.json`
 (`%USERPROFILE%\.config\komorebi\applications.json`):
 
