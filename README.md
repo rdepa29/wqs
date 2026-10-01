@@ -140,6 +140,27 @@ works as-is. The following are available under `import Quickshell`:
 - value types `panelAnchors`, `panelMargins`, `popupAnchorRect`, and the
   `Edges` / `ExclusionMode` enums
 
+And under `import Quickshell.Komorebi` (a wqs extension, not upstream Quickshell):
+
+- `Komorebi` - the window manager singleton: `available`, `monitors`,
+  `workspaces`, `toplevels` (plain JS arrays, rebuilt on change),
+  `focusedMonitor`, `focusedWorkspace`, `activeToplevel`, plus
+  `dispatch(command, args)`, `query(command, args)`, `refresh()` and
+  `monitorFor(screen)`
+- `KomorebiMonitor` - `name`, `id`, `device`, `size`, `workArea`, `active`,
+  `activeWorkspace`, `workspaces`
+- `KomorebiWorkspace` - `name`, `index`, `monitorName`, `active`,
+  `windowCount`, `toplevels`
+- `KomorebiToplevel` - `title`, `exe`, `cls`, `hwnd`, `rect`,
+  `workspaceName`, `monitorName`, `active`
+- `KomorebiRect` - `x`, `y`, `width`, `height`
+
+State is fed by komorebi's event pipe: wqs hosts a named pipe, launches
+`komorebic.exe subscribe-pipe <name>`, and komorebi pushes the full state as
+JSON on every change. Events are debounced, so there is no polling. A one-shot
+`komorebic.exe state` bootstraps the model if the pipe has not attached yet,
+which is also what `refresh()` does.
+
 And under `import Quickshell.Io`:
 
 - `Process` - `command`, `workingDirectory`, `environment`, `clearEnvironment`,
@@ -230,7 +251,14 @@ The ignore rule lives in komorebi's `applications.json`
 - a widget set (clock, workspaces, tray, media) and a theme language
 - app-bar registration for non-edge `FloatingWindow`s (Windows only docks
   app-bars to an edge, so centered windows cannot reserve space this way)
+- port the Caelestia shell on top of this base: the remaining work is the
+  QML infrastructure (`Singleton`, `Variants`, `Scope`, `Binding`, `LazyLoader`,
+  `Reloadable`, `PersistentProperties`), `Quickshell.Widgets`, the Caelestia
+  C++ plugin, and Windows stand-ins for the Linux-only services
+  (UPower, Bluetooth, MPRIS, Pipewire, notifications, global shortcuts)
 
 ## License
 
-MIT.
+GPL-3.0. The desktop shell configuration being ported to this base,
+[Caelestia](https://github.com/caelestia-dots/shell), is GPL-3.0, so this port
+carries the same license.

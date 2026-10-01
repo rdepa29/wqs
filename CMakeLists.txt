@@ -55,6 +55,20 @@ qt_add_qml_module(quickshell_io
 target_include_directories(quickshell_io PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/quickshell/io)
 target_link_libraries(quickshell_io PUBLIC Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network)
 
+# === The Quickshell.Komorebi QML module =====================================
+qt_add_library(quickshell_komorebi STATIC)
+qt_add_qml_module(quickshell_komorebi
+    URI Quickshell.Komorebi
+    VERSION 1.0
+    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/qml_modules/Quickshell/Komorebi
+    SOURCES
+        src/quickshell/komorebi/KomorebiTypes.h
+        src/quickshell/komorebi/Komorebi.h
+        src/quickshell/komorebi/Komorebi.cpp
+)
+target_include_directories(quickshell_komorebi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/quickshell/komorebi)
+target_link_libraries(quickshell_komorebi PUBLIC Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network)
+
 # console subsystem so shells wait and see exit codes; the shell relaunches detached
 qt_add_executable(wqs
     src/main.cpp
@@ -78,14 +92,15 @@ qt_add_qml_module(wqs
 
 target_link_libraries(wqs PRIVATE
     Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network
-    quickshell quickshell_io
-    quickshellplugin quickshell_ioplugin
+    quickshell quickshell_io quickshell_komorebi
+    quickshellplugin quickshell_ioplugin quickshell_komorebiplugin
 )
 
 # pull in the plugin init objects the linker would otherwise drop
 target_sources(wqs PRIVATE
     $<TARGET_OBJECTS:quickshellplugin_init>
     $<TARGET_OBJECTS:quickshell_ioplugin_init>
+    $<TARGET_OBJECTS:quickshell_komorebiplugin_init>
 )
 
 target_compile_definitions(wqs PRIVATE
