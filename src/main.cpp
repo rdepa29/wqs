@@ -12,6 +12,7 @@
 #include "IpcServer.h"
 #include "Shell.h"
 #include "quickshell/Quickshell.h"
+#include "quickshell/generation.h"
 
 namespace {
 
@@ -125,6 +126,10 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    // the generation owns the root object and the reload sequence; Reloadable, Singleton and
+    // LazyLoader all find it again by walking up to the engine it is registered against
+    wqs::EngineGeneration generation(&engine);
+
     // control channel for list/kill/ipc
     IpcServer ipc(entry);
     ipc.registerHandler(QStringLiteral("wqs"), QStringLiteral("version"),
@@ -139,8 +144,7 @@ int main(int argc, char *argv[])
         qWarning().noquote() << "wqs: IPC server failed to start:" << ipc.errorString();
     QObject::connect(&ipc, &IpcServer::quitRequested, &app, &QCoreApplication::quit);
 
-    engine.load(source.url);
-    if (engine.rootObjects().isEmpty()) {
+    if (!generation.load(source.url)) {
         qCritical().noquote() << "wqs: failed to load" << entry << "(details above in the log)";
         return 1;
     }

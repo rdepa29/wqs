@@ -18,6 +18,7 @@ qt_add_qml_module(quickshell
     VERSION 1.0
     OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/qml_modules/Quickshell
     SOURCES
+        src/quickshell/doc.hpp
         src/quickshell/Types.h
         src/quickshell/AppBar.h
         src/quickshell/AppBar.cpp
@@ -25,8 +26,22 @@ qt_add_qml_module(quickshell
         src/quickshell/Screen.cpp
         src/quickshell/Quickshell.h
         src/quickshell/Quickshell.cpp
-        src/quickshell/Scope.h
-        src/quickshell/Scope.cpp
+        src/quickshell/incubator.h
+        src/quickshell/incubator.cpp
+        src/quickshell/reload.h
+        src/quickshell/reload.cpp
+        src/quickshell/generation.h
+        src/quickshell/generation.cpp
+        src/quickshell/singleton.h
+        src/quickshell/singleton.cpp
+        src/quickshell/variants.h
+        src/quickshell/variants.cpp
+        src/quickshell/persistentprops.h
+        src/quickshell/persistentprops.cpp
+        src/quickshell/lazyloader.h
+        src/quickshell/lazyloader.cpp
+        src/quickshell/ShellRoot.h
+        src/quickshell/ShellRoot.cpp
         src/quickshell/Window.h
         src/quickshell/Window.cpp
 )

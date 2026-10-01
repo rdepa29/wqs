@@ -1,12 +1,13 @@
 #pragma once
 
-#include <QList>
 #include <QObject>
-#include <QQmlListProperty>
 #include <QtQmlIntegration/qqmlintegration.h>
+
+#include "reload.h"
 
 namespace wqs {
 
+///! Accessor for some options under the Quickshell type.
 class QuickshellSettings : public QObject
 {
     Q_OBJECT
@@ -33,28 +34,8 @@ private:
     bool m_reloadPopup = true;
 };
 
-class Scope : public QObject
-{
-    Q_OBJECT
-    QML_ELEMENT
-    Q_PROPERTY(QQmlListProperty<QObject> children READ children)
-    Q_CLASSINFO("DefaultProperty", "children")
-
-public:
-    explicit Scope(QObject *parent = nullptr);
-
-    QQmlListProperty<QObject> children();
-
-private:
-    static void appendChild(QQmlListProperty<QObject> *prop, QObject *object);
-    static qsizetype childCount(QQmlListProperty<QObject> *prop);
-    static QObject *childAt(QQmlListProperty<QObject> *prop, qsizetype index);
-    static void clearChildren(QQmlListProperty<QObject> *prop);
-
-    QList<QObject *> m_children;
-};
-
-class ShellRoot : public Scope
+///! Optional root config element, allowing some settings to be specified inline.
+class ShellRoot : public ReloadPropagator
 {
     Q_OBJECT
     QML_ELEMENT
