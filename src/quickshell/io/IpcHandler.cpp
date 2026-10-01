@@ -50,8 +50,7 @@ QVariant IpcHandler::handle(const QVariantList &args, QString *error)
         parts << arg.toString();
     const QString message = parts.join(QLatin1Char(' '));
 
-    // A QML `handle(message)` may be declared with or without type annotations, so its
-    // parameter and return types are discovered from the meta-object rather than assumed.
+    // QML handle() may be annotated or not, so read the types off the meta-object
     const QMetaObject *meta = metaObject();
     for (int i = 0; i < meta->methodCount(); ++i) {
         const QMetaMethod method = meta->method(i);

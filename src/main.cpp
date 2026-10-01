@@ -15,9 +15,6 @@
 
 namespace {
 
-// Minimal file logger. Quickshell writes to its runtime dir; wqs uses a stable
-// %USERPROFILE%\.config\wqs\wqs.log so issues show up in one place across runs. Logging
-// is best-effort: an unwritable directory simply means no log line.
 void logLine(const QString &line)
 {
     QDir dir(QDir::home().filePath(QStringLiteral(".config/wqs")));
@@ -37,8 +34,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &, const QString &m
     Q_UNUSED(type)
     logLine(message);
 
-    // Also mirror to the console when one is attached, so a shell started from a
-    // terminal shows the same diagnostics that land in the log file.
+    // also mirror to a console if one is attached
     QTextStream(stderr) << message << '\n';
 }
 
@@ -51,7 +47,7 @@ int main(int argc, char *argv[])
     for (int i = 1; i < argc; ++i)
         args << QString::fromLocal8Bit(argv[i]);
 
-    // Internal marker set on the detached shell process; stripped before parsing.
+    // internal marker on the detached process; stripped before parsing
     const bool alreadyDetached = args.removeAll(QString::fromLatin1(Cli::kDetachedArg)) > 0;
 
     const Cli::Command command = Cli::parse(args);
@@ -70,7 +66,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    // Subcommands talk to a running shell; they never start one themselves.
+    // client subcommands never start a shell
     if (Cli::isClientCommand(command.kind)) {
         QCoreApplication app(argc, argv);
         app.setApplicationName(QStringLiteral("wqs"));
@@ -78,9 +74,7 @@ int main(int argc, char *argv[])
         return Cli::execute(command);
     }
 
-    // Resolve which shell.qml to run before detaching, so `-n` can still report a duplicate
-    // instance to the terminal that launched wqs. Quickshell's config order is ported:
-    // -p/--path or -c/--config, with WQS_CONFIG_PATH / WQS_CONFIG_NAME as fallbacks.
+    // resolve shell.qml before detaching so -n can still report a duplicate
     const QString pathOpt = !command.path.isEmpty()
         ? command.path
         : qEnvironmentVariable("WQS_CONFIG_PATH");
@@ -107,9 +101,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    // The shell is a long-running windowed process. Start it detached so launching it from
-    // a terminal returns the prompt immediately and shows no console window, while the
-    // client subcommands above keep the terminal they were run from.
+    // start the shell detached so the terminal prompt returns immediately
     if (!alreadyDetached && Cli::relaunchDetached(args))
         return 0;
 
@@ -117,18 +109,15 @@ int main(int argc, char *argv[])
     app.setApplicationName(QStringLiteral("wqs"));
     app.setOrganizationName(QStringLiteral("wqs"));
     app.setApplicationVersion(QStringLiteral(WQS_VERSION));
-    // A shell owns several windows (panels, floating windows, popups). Closing one must
-    // not tear the whole process down.
+    // closing one window shouldn't quit the whole shell
     app.setQuitOnLastWindowClosed(false);
 
     qInstallMessageHandler(messageHandler);
 
-    // ShellRoot is the owning scope of the whole shell, mirroring Quickshell's ShellRoot.
-    // Everything the shell needs (paths, screens, version) hangs off it.
+    // root scope of the shell
     Shell shell;
 
-    // Quickshell.shellDir points at the folder holding the entry shell.qml, matching the
-    // directory a Quickshell config would see.
+    // shellDir = folder holding the entry shell.qml
     const QString shellDir = source.isResource
         ? QDir::home().filePath(QStringLiteral(".config/wqs"))
         : QFileInfo(entry).absolutePath();
@@ -136,8 +125,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    // The control channel behind `wqs list` / `wqs kill` / `wqs ipc`. The built-in `wqs`
-    // target mirrors the handful of Quickshell IPC handlers that make sense here.
+    // control channel for list/kill/ipc
     IpcServer ipc(entry);
     ipc.registerHandler(QStringLiteral("wqs"), QStringLiteral("version"),
                         [](const QVariantList &, QString *) -> QVariant {

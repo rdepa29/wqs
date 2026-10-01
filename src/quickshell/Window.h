@@ -22,7 +22,6 @@ class QQuickWindow;
 
 namespace wqs {
 
-/// A click-through / geometry rect used by @@PopupAnchor.rect.
 struct PopupAnchorRect
 {
     Q_GADGET
@@ -45,9 +44,6 @@ public:
     }
 };
 
-/// Port of `PopupAnchor`, the positioner for @@PopupWindow. Holds the window (or item)
-/// the popup is attached to plus an offset rect, matching `anchor.window` and
-/// `anchor.rect.x/y`.
 class PopupAnchor : public QObject
 {
     Q_OBJECT
@@ -76,9 +72,6 @@ private:
     PopupAnchorRect m_rect;
 };
 
-/// Port of `QsWindow`, the base class of every Quickshell window. On Windows there is no
-/// layer-shell protocol, so each window owns a real QQuickWindow: QML children are
-/// reparented into its content item and the geometry is managed by wqs.
 class QsWindow : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -158,15 +151,10 @@ signals:
     void updatesEnabledChanged();
 
 protected:
-    /// The OS window flags for this window type.
     virtual Qt::WindowFlags windowFlags() const;
-    /// The window title advertised to the OS / window manager.
     virtual QString windowTitle() const;
-    /// Default visibility for this window type.
     virtual bool defaultVisible() const { return true; }
-    /// Recompute the window geometry. Called whenever an input to layout changes.
     virtual void updateGeometry();
-    /// Called by subclasses when a layout-relevant property changes.
     void relayout();
 
     void setActualSize(qint32 width, qint32 height);
@@ -192,7 +180,6 @@ private:
     QList<QObject *> m_children;
 };
 
-/// Port of `PanelWindow`, a decorationless window anchored to screen edges.
 class PanelWindow : public QsWindow
 {
     Q_OBJECT
@@ -246,7 +233,6 @@ private:
     AppBar m_appBar;
 };
 
-/// Port of `FloatingWindow`, a standard toplevel window.
 class FloatingWindow : public QsWindow
 {
     Q_OBJECT

@@ -65,8 +65,7 @@ void AppBar::reserveForWindow(QWindow *window, Edge edge, int logicalThickness)
         return;
     }
 
-    // A changed HWND means Qt recreated the native window (e.g. a QWindow flag changed);
-    // drop the stale registration before reusing the handle.
+    // Qt recreated the hwnd; drop the stale registration first
     if (m_impl->hwnd != hwnd) {
         m_impl->removeBar();
         m_impl->hwnd = hwnd;
@@ -153,9 +152,7 @@ void AppBar::reserve(Edge edge, const QRect &nativeStrip)
 
     SHAppBarMessage(ABM_QUERYPOS, &abd);
 
-    // QUERYPOS slides the rect along the edge to a valid position but can shrink other
-    // sides; restore the requested span/thickness so the reservation covers what we asked
-    // for, then commit it.
+    // QUERYPOS can shrink us; restore the requested span then commit
     switch (abd.uEdge) {
     case ABE_TOP: abd.rc.bottom = abd.rc.top + nativeStrip.height(); break;
     case ABE_BOTTOM: abd.rc.top = abd.rc.bottom - nativeStrip.height(); break;

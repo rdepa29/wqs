@@ -13,10 +13,6 @@ class QJSEngine;
 
 namespace wqs {
 
-/// Port of the `Quickshell` QML singleton. Every shell config imports this (`import
-/// Quickshell`) and reaches for paths, screens, and helpers through it. wqs keeps the
-/// surface that makes sense on Windows: directories, screens, process id, version
-/// gates, and detached execution. Wayland-only facilities are inert.
 class Quickshell : public QObject
 {
     Q_OBJECT
@@ -42,8 +38,7 @@ public:
     static Quickshell *create(QQmlEngine *engine, QJSEngine *jsEngine);
     static Quickshell *instance();
 
-    /// The directory of the entry shell.qml, published by main() so `Quickshell.shellDir`
-    /// (and shellPath()) resolve the way a Quickshell config expects.
+    // main() publishes the entry shell.qml dir here
     static void setShellDir(const QString &dir);
 
     QString cacheDir() const;

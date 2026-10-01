@@ -13,9 +13,7 @@
 
 #include "DataStreamParser.h"
 
-// The C runtime headers (pulled in by the Qt headers above) define `signal`, `stdin`,
-// `stdout`, and `stderr` as macros. The ported Quickshell API uses those names, so they
-// have to be un-defined here or moc cannot parse the declarations.
+// signal/stdin/stdout/stderr are C macros; undef so moc can read the API names
 #ifdef signal
 #undef signal
 #endif
@@ -33,8 +31,6 @@ namespace wqs {
 
 class DataStreamParser;
 
-/// Port of Quickshell's `Process`. Runs an external program and streams its output into
-/// `stdout`/`stderr` parser objects, exactly as a Quickshell config expects.
 class Process : public QObject, public QQmlParserStatus
 {
     Q_OBJECT

@@ -8,8 +8,6 @@
 
 namespace wqs {
 
-/// Port of Quickshell's `IpcHandler`. A config gives it a `target` and a `handle(message)`
-/// method; calls arriving over `wqs ipc call <target> handle ...` are routed here.
 class IpcHandler : public QObject
 {
     Q_OBJECT

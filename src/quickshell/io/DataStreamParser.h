@@ -7,9 +7,6 @@
 
 namespace wqs {
 
-/// Port of Quickshell's `DataStreamParser`, the base for objects that process a running
-/// process's stdout/stderr. `Process` feeds bytes in and calls finish() when the process
-/// exits.
 class DataStreamParser : public QObject
 {
     Q_OBJECT
@@ -28,8 +25,6 @@ signals:
     void streamFinished();
 };
 
-/// Port of `StdioCollector`: buffers the entire stream and exposes it as `text`/`data`
-/// once the process exits (signalled by `streamFinished`).
 class StdioCollector : public DataStreamParser
 {
     Q_OBJECT
@@ -56,8 +51,6 @@ private:
     QByteArray m_data;
 };
 
-/// Port of `SplitParser`: splits the stream on `splitMarker` (default newline) and emits
-/// `read(line)` per line.
 class SplitParser : public DataStreamParser
 {
     Q_OBJECT

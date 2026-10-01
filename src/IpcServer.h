@@ -11,23 +11,18 @@
 
 class QLocalSocket;
 
-/// Server side of the wqs control channel. One per running shell process. It listens on a
-/// named pipe, answers `wqs list` / `wqs kill`, and routes `wqs ipc call` to a small
-/// handler registry - the counterpart of a Quickshell `IpcHandler`. Built-in handlers
-/// (the `wqs` target: `version`, `screens`) are registered from main.cpp.
+// named-pipe control channel: list/kill/ipc, one per shell process
 class IpcServer : public QObject
 {
     Q_OBJECT
 
 public:
-    /// `error` is set to a message on failure, otherwise left empty.
     using Handler = std::function<QVariant(const QVariantList &args, QString *error)>;
 
     explicit IpcServer(const QString &configPath, QObject *parent = nullptr);
     ~IpcServer() override;
 
-    /// The single server for this process, so QML `IpcHandler`s can register themselves
-    /// without a context property.
+    // the process's single server, so IpcHandlers can self-register
     static IpcServer *instance();
 
     bool listen();

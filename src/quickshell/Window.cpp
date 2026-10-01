@@ -281,8 +281,7 @@ void QsWindow::clearChildren(QQmlListProperty<QObject> *prop)
 PanelWindow::PanelWindow(QObject *parent)
     : QsWindow(parent)
 {
-    // The bar is (re)registered as a Windows app-bar once the native window is shown; the
-    // base class hides the window until componentComplete, so react to visibility here.
+    // base hides the window until componentComplete, so hook visibility
     connect(m_window, &QWindow::visibleChanged, this, [this] { updateAppBar(); });
 }
 
@@ -356,9 +355,7 @@ Qt::WindowFlags PanelWindow::windowFlags() const
 
 QString PanelWindow::windowTitle() const
 {
-    // Every wqs window that is not explicitly tagged "-dwm" is an obstacle: komorebi (and
-    // compatibles) ignore it, and edge-anchored panels additionally register as a Windows
-    // app-bar (see updateAppBar) so the work area is reserved like the taskbar's.
+    // non-dwm = obstacle: komorebi ignores it, edge panels reserve via app-bar
     return QStringLiteral("wqs-window");
 }
 
@@ -404,7 +401,7 @@ void PanelWindow::updateAppBar()
         return;
     }
 
-    // Ignore mode never reserves space, matching Quickshell's exclusionMode semantics.
+    // Ignore mode reserves nothing
     if (m_exclusionMode == ExclusionMode::Ignore) {
         m_appBar.clear();
         return;
@@ -420,7 +417,7 @@ void PanelWindow::updateAppBar()
     else if (m_anchors.right)
         edge = AppBar::Right;
 
-    // Only edges can host an app-bar; a free-floating panel reserves nothing.
+    // only edges can be app-bars
     m_appBar.reserveForWindow(m_window, edge, m_exclusiveZone);
 }
 

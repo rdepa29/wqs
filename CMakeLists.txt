@@ -11,9 +11,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Quick Qml Network)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
-# === The Quickshell QML module =============================================
-# A static library so the module owns its own qmltypes/qmldir. The URI and type names
-# match upstream Quickshell, so an existing config loads unchanged.
+# the Quickshell QML module
 qt_add_library(quickshell STATIC)
 qt_add_qml_module(quickshell
     URI Quickshell
@@ -57,10 +55,7 @@ qt_add_qml_module(quickshell_io
 target_include_directories(quickshell_io PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/quickshell/io)
 target_link_libraries(quickshell_io PUBLIC Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network)
 
-# === The executable ========================================================
-# Console subsystem (no WIN32), so cmd/PowerShell/fish wait for the process,
-# capture its output, and see its exit code. When it starts the shell it
-# re-launches itself detached, so the bar still runs without a console window.
+# console subsystem so shells wait and see exit codes; the shell relaunches detached
 qt_add_executable(wqs
     src/main.cpp
     src/Shell.cpp
@@ -73,7 +68,7 @@ qt_add_executable(wqs
     src/IpcServer.h
 )
 
-# The bundled fallback config. The URI prefix must match the load path in main.cpp.
+# bundled fallback config (URI must match main.cpp)
 qt_add_qml_module(wqs
     URI wqs
     VERSION 1.0
@@ -87,8 +82,7 @@ target_link_libraries(wqs PRIVATE
     quickshellplugin quickshell_ioplugin
 )
 
-# A static QML module's type registration lives in an object file that nothing references,
-# so the linker would drop it. Pull the generated plugin init objects in explicitly.
+# pull in the plugin init objects the linker would otherwise drop
 target_sources(wqs PRIVATE
     $<TARGET_OBJECTS:quickshellplugin_init>
     $<TARGET_OBJECTS:quickshell_ioplugin_init>

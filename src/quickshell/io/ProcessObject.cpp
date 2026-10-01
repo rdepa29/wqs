@@ -64,8 +64,7 @@ void Process::setRunning(bool running)
     if (m_running == running)
         return;
     if (running) {
-        // `running: true` is often set before `command` in a QML object; retry once the
-        // object finishes being created (see componentComplete).
+        // `running: true` can come before `command`; retry in componentComplete
         m_pendingStart = !start();
     } else {
         m_pendingStart = false;

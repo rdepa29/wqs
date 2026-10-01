@@ -2,19 +2,9 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-// wqs shell config, ported from Quickshell's guided introduction
-// (https://quickshell.org/docs/v0.3.1/guide/introduction) - a top bar with a centered
-// clock that ticks every second.
-//
-// Quickshell loads configuration from ~/.config/quickshell/<name>/shell.qml. wqs ports
-// that: it loads %USERPROFILE%\.config\wqs\shell.qml (or a named config via
-// `wqs -c <name>`, or an explicit file/dir via `wqs -p <path>`) and falls back to this
-// bundled copy when the user has no config.
-
 ShellRoot {
     id: root
 
-    // A simple IPC endpoint: `wqs ipc call example handle <message>`.
     IpcHandler {
         target: "example"
 

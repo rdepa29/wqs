@@ -6,8 +6,7 @@
 
 namespace wqs {
 
-/// Grouped anchor flags for @@PanelWindow.anchors. A value type so QML can write
-/// `anchors { top: true; left: true }` exactly as upstream Quickshell allows.
+// anchor flags, so QML can write `anchors { top: true }`
 struct Anchors
 {
     Q_GADGET
@@ -30,7 +29,7 @@ public:
     bool operator==(const Anchors &other) const = default;
 };
 
-/// Grouped pixel offsets for @@PanelWindow.margins.
+// pixel offsets for PanelWindow.margins
 struct Margins
 {
     Q_GADGET
@@ -50,24 +49,20 @@ public:
     bool operator==(const Margins &other) const = default;
 };
 
-/// @@PanelWindow.exclusionMode.
 namespace ExclusionMode {
 Q_NAMESPACE
 QML_ELEMENT
 
 enum Enum : quint8 {
-    /// Respect other shell layers' exclusion zones and optionally reserve one.
-    Normal = 0,
-    /// Ignore other layers and never reserve a zone.
-    Ignore = 1,
-    /// Reserve space based on the window's anchors and size.
-    Auto = 2,
+    Normal = 0, // respect others, optionally reserve
+    Ignore = 1, // ignore others, never reserve
+    Auto = 2,   // reserve from anchors + size
 };
 Q_ENUM_NS(Enum)
 
 } // namespace ExclusionMode
 
-/// Screen edges, used by @@FloatingWindow.startSystemResize.
+// screen edges, for FloatingWindow.startSystemResize
 namespace Edges {
 Q_NAMESPACE
 QML_ELEMENT

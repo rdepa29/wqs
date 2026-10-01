@@ -4,10 +4,7 @@
 #include <QList>
 #include <QString>
 
-/// Metadata for one running `wqs` process, persisted so `wqs list` / `wqs kill` /
-/// `wqs ipc` can find it. Quickshell scopes instances to a display and talks to them over
-/// an XDG runtime socket; Windows has neither, so wqs keys instances by process id and
-/// talks to them over a QLocalServer named pipe (`wqs-<pid>`).
+// one running wqs process; keyed by pid, reachable over a `wqs-<pid>` named pipe
 struct InstanceInfo
 {
     qint64 pid = 0;
@@ -25,11 +22,10 @@ struct InstanceInfo
     bool writeToRegistry() const;
     void removeFromRegistry() const;
 
-    /// Every registry entry that still answers a ping, with dead entries pruned.
+    // live entries only, dead ones pruned
     static QList<InstanceInfo> running();
 
-    /// Sends one JSON command and waits for one reply. Returns false on any failure and
-    /// sets `error` when non-null.
+    // send one JSON command, wait for one reply
     static bool send(const InstanceInfo &info, const QJsonObject &command, QJsonObject *reply,
                      QString *error, int timeoutMs = 5000);
 };

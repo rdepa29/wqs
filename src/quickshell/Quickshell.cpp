@@ -169,7 +169,7 @@ void Quickshell::execDetached(const QVariant &context) const
 
 bool Quickshell::hasVersion(int major, int minor) const
 {
-    // wqs implements the Quickshell 0.3 API surface.
+    // Quickshell 0.3 API
     constexpr int kMajor = 0;
     constexpr int kMinor = 3;
     if (major != kMajor)
@@ -200,8 +200,7 @@ void Quickshell::inhibitReloadPopup() const
 
 void Quickshell::reload(bool)
 {
-    // Hot reloading is not implemented yet; report success so configs that wait on the
-    // completion hook continue to run.
+    // hot reload TBD; still emit so configs waiting on it keep going
     emit reloadCompleted();
 }
 

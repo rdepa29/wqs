@@ -7,9 +7,6 @@
 
 namespace wqs {
 
-/// Port of `QuickshellSettings`, reached through @@ShellRoot.settings. Quickshell uses it
-/// for reload and watch behavior; wqs keeps the fields a config may set so it loads, and
-/// wires up what maps to this port.
 class QuickshellSettings : public QObject
 {
     Q_OBJECT
@@ -36,8 +33,6 @@ private:
     bool m_reloadPopup = true;
 };
 
-/// Port of `Scope`: a non-visual container whose children behave as if declared in the
-/// parent. Configs nest windows and singletons inside it.
 class Scope : public QObject
 {
     Q_OBJECT
@@ -59,7 +54,6 @@ private:
     QList<QObject *> m_children;
 };
 
-/// Port of `ShellRoot`, the optional root element of a shell config.
 class ShellRoot : public Scope
 {
     Q_OBJECT

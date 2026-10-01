@@ -109,9 +109,8 @@ bool InstanceInfo::send(const InstanceInfo &info, const QJsonObject &command, QJ
     }
 
     QByteArray data;
-    // A "quit" reply is flushed just before the other side shuts the socket down, so the
-    // final line can arrive together with the disconnect. Drain whatever is buffered both
-    // before waiting and after a failed wait instead of treating the close as an error.
+    // the reply can land together with the peer closing, so drain both before and
+    // after a failed wait
     for (;;) {
         if (socket.bytesAvailable() > 0) {
             data += socket.readAll();

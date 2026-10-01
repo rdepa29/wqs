@@ -10,8 +10,6 @@ Shell::Shell(QObject *parent)
 {
     refreshScreens();
 
-    // Quickshell rederives this on hot-reload; wqs keeps the list live so a monitor is
-    // added or removed, the next query sees it.
     if (auto *app = qobject_cast<QGuiApplication *>(QGuiApplication::instance())) {
         connect(app, &QGuiApplication::screenAdded, this, &Shell::refreshScreens);
         connect(app, &QGuiApplication::screenRemoved, this, &Shell::refreshScreens);
@@ -28,8 +26,7 @@ QStringList Shell::screens() const
 
 QString Shell::configPath() const
 {
-    // Mirrors Quickshell's ~/.config/quickshell/ convention, on Windows that place is
-    // %USERPROFILE%\.config\wqs, next to where wsddm keeps its config.
+    // %USERPROFILE%\.config\wqs
     return QDir::home().filePath(QStringLiteral(".config/wqs"));
 }
 
@@ -71,8 +68,7 @@ Shell::Source Shell::resolveSource(const QString &pathOpt, const QString &config
         return {QUrl::fromLocalFile(QFileInfo(file).absoluteFilePath()), false};
     }
 
-    // Quickshell convention: <config>/shell.qml is the config, otherwise a named
-    // <config>/default/shell.qml. Fall back to the shell bundled into the executable.
+    // <config>/shell.qml, else <config>/default/shell.qml, else the bundled shell
     for (const QString &candidate :
          {QDir(root).filePath(QStringLiteral("shell.qml")),
           QDir(root).filePath(QStringLiteral("default/shell.qml"))}) {

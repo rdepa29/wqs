@@ -7,9 +7,6 @@ class QScreen;
 
 namespace wqs {
 
-/// Port of Quickshell's `ShellScreen`. A monitor object used to pick the screen for a
-/// window and to query geometry. Quickshell wraps the private QQuickScreenInfo; wqs
-/// wraps the public QScreen directly, which carries the same information on Windows.
 class QuickshellScreenInfo : public QObject
 {
     Q_OBJECT

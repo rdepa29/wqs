@@ -53,8 +53,7 @@ void printValue(const QJsonValue &value, QTextStream &out)
 }
 
 #ifdef Q_OS_WIN
-// Quotes one argument the way CommandLineToArgvW parses it, so re-launching wqs
-// preserves every argument exactly (including spaces and quotes).
+// quote for CommandLineToArgvW so a relaunched wqs keeps its args intact
 QString quoteWindowsArg(const QString &arg)
 {
     if (!arg.isEmpty() && !arg.contains(QLatin1Char(' ')) && !arg.contains(QLatin1Char('\t'))
