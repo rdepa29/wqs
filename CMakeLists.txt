@@ -44,6 +44,10 @@ qt_add_qml_module(quickshell
         src/quickshell/Region.cpp
         src/quickshell/TransformWatcher.h
         src/quickshell/TransformWatcher.cpp
+        src/quickshell/clock.h
+        src/quickshell/clock.cpp
+        src/quickshell/elapsedtimer.h
+        src/quickshell/elapsedtimer.cpp
         src/quickshell/model.h
         src/quickshell/model.cpp
         src/quickshell/desktopentry.h
