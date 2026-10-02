@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Quick Qml Network)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Quick Qml Network ShaderToolsTools)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -94,6 +94,48 @@ qt_add_qml_module(quickshell_komorebi
 target_include_directories(quickshell_komorebi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/quickshell/komorebi)
 target_link_libraries(quickshell_komorebi PUBLIC Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network)
 
+# === The Quickshell.Widgets QML module =======================================
+qt_policy(SET QTP0004 NEW)
+qt_add_library(quickshell_widgets STATIC)
+qt_add_qml_module(quickshell_widgets
+    URI Quickshell.Widgets
+    VERSION 1.0
+    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/qml_modules/Quickshell/Widgets
+    SOURCES
+        src/widgets/cliprect.hpp
+        src/widgets/cliprect.cpp
+        src/widgets/wrapper.hpp
+        src/widgets/wrapper.cpp
+        src/widgets/marginwrapper.hpp
+        src/widgets/marginwrapper.cpp
+    QML_FILES
+        src/widgets/IconImage.qml
+        src/widgets/ClippingRectangle.qml
+        src/widgets/ClippingWrapperRectangle.qml
+        src/widgets/ClippingWrapperRectangleInternal.qml
+        src/widgets/WrapperItem.qml
+        src/widgets/WrapperMouseArea.qml
+        src/widgets/WrapperRectangle.qml
+)
+target_include_directories(quickshell_widgets PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets)
+target_link_libraries(quickshell_widgets PUBLIC Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml)
+
+# clipping shaders; the "-ub" variant lets content render underneath the border
+qt6_add_shaders(quickshell_widgets "widgets-cliprect"
+    NOHLSL NOMSL BATCHABLE PRECOMPILE OPTIMIZED QUIET
+    PREFIX "/Quickshell/Widgets"
+    FILES src/widgets/shaders/cliprect.frag
+    OUTPUTS shaders/cliprect.frag.qsb
+)
+
+qt6_add_shaders(quickshell_widgets "widgets-cliprect-ub"
+    NOHLSL NOMSL BATCHABLE PRECOMPILE OPTIMIZED QUIET
+    PREFIX "/Quickshell/Widgets"
+    FILES src/widgets/shaders/cliprect.frag
+    OUTPUTS shaders/cliprect-ub.frag.qsb
+    DEFINES CONTENT_UNDER_BORDER
+)
+
 # console subsystem so shells wait and see exit codes; the shell relaunches detached
 qt_add_executable(wqs
     src/main.cpp
@@ -117,8 +159,8 @@ qt_add_qml_module(wqs
 
 target_link_libraries(wqs PRIVATE
     Qt6::Core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network
-    quickshell quickshell_io quickshell_komorebi
-    quickshellplugin quickshell_ioplugin quickshell_komorebiplugin
+    quickshell quickshell_io quickshell_komorebi quickshell_widgets
+    quickshellplugin quickshell_ioplugin quickshell_komorebiplugin quickshell_widgetsplugin
 )
 
 # pull in the plugin init objects the linker would otherwise drop
@@ -126,6 +168,7 @@ target_sources(wqs PRIVATE
     $<TARGET_OBJECTS:quickshellplugin_init>
     $<TARGET_OBJECTS:quickshell_ioplugin_init>
     $<TARGET_OBJECTS:quickshell_komorebiplugin_init>
+    $<TARGET_OBJECTS:quickshell_widgetsplugin_init>
 )
 
 target_compile_definitions(wqs PRIVATE

@@ -156,6 +156,20 @@ works as-is. The following are available under `import Quickshell`:
   `Edges` / `ExclusionMode` / `RegionShape` / `Intersection` / `ObjectComparison`
   enums
 
+And under `import Quickshell.Widgets`:
+
+- `IconImage` - square (`1:1`) icon image; `implicitSize`, `source`, `backer`
+- `ClippingRectangle` - clips `contentItem` to its border and rounded corners;
+  `contentUnderBorder`, `contentInsideBorder`, `radius`, per-corner radii, and
+  the `clippingRectangleBorder` value type
+- `ClippingWrapperRectangle` - `ClippingRectangle` with a single wrapped child,
+  sized to the child's implicit size
+- `WrapperItem` / `WrapperRectangle` / `WrapperMouseArea` - single-child wrappers
+  that size themselves to the child and apply `margin` / `extraMargin` /
+  per-side margins; `child` selects the wrapped item
+- `WrapperManager` / `MarginWrapperManager` - the underlying C++ managers, usable
+  from your own wrapper components
+
 And under `import Quickshell.Komorebi` (a wqs extension, not upstream Quickshell):
 
 - `Komorebi` - the window manager singleton: `available`, `monitors`,
@@ -290,12 +304,12 @@ The ignore rule lives in komorebi's `applications.json`
 - app-bar registration for non-edge `FloatingWindow`s (Windows only docks
   app-bars to an edge, so centered windows cannot reserve space this way)
 - port the Caelestia shell on top of this base: the remaining work is
-  `Quickshell.Widgets`, the core types still missing (`SystemClock`, `ObjectModel`,
-  `ScriptModel`, `Region`, `TransformWatcher`, `ColorQuantizer`, `Retainable`,
-  `EasingCurve`, `ElapsedTimer`, `BoundComponent`), the Caelestia C++ plugin, the
-  `qs:` config import path that Caelestia singletons rely on, and Windows
-  stand-ins for the Linux-only services (UPower, Bluetooth, MPRIS, Pipewire,
-  notifications, global shortcuts)
+  the core types still missing (`SystemClock`, `ElapsedTimer`, `ObjectModel`,
+  `ColorQuantizer`, `Retainable`, `EasingCurve`, `BoundComponent`), desktop-entry
+  types, the Caelestia C++ plugin, and Windows stand-ins for the Linux-only
+  services (UPower, Bluetooth, MPRIS, Pipewire, notifications, global shortcuts)
+  - `Variants.model` currently only accepts a list, not a `QAbstractItemModel`,
+    so `ScriptModel` has to be wrapped in a list to be passed to `Variants`
 
 ## License
 
