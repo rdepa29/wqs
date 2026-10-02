@@ -185,6 +185,26 @@ topmost frameless window rather than a Wayland layer-shell surface, but an
 edge-docked panel still reserves its strip by registering as a Windows app-bar,
 and a few Qt-only helpers (clipboard, theme icons) are present but partial.
 
+### The `qs:` config namespace
+
+Config files import each other through the `qs:` prefix, exactly as on
+upstream Quickshell: `import qs.services` in `<config>/modules/Foo.qml` means
+`<config>/services`. The `qs:` scheme is served by the config directory, which
+is where `shell.qml` lives.
+
+Qt will not resolve a module from an import path unless a `qmldir` sits next to
+it, and configs ship plain `.qml` files in folders instead. So wqs walks the
+config tree at startup and synthesizes a `qmldir` for every directory that lacks
+one, declaring each `Type.qml` and marking the ones whose file starts with
+`pragma Singleton` as singletons. Those qmldirs only exist in memory and are
+answered by the network access manager.
+
+The synthesized qmldir is deliberately not written to disk, so a config stays a
+plain folder of QML files and does not accumulate generated files. Upstream
+instead follows imports lazily and runs its QML preprocessor in the same pass;
+wqs walks the whole config root up front instead, and has no preprocessor yet,
+so `//@` pragmas and conditional compilation do not work.
+
 ## Command line
 
 wqs carries Quickshell's `qs` tool as `wqs`:

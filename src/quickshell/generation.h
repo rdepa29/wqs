@@ -1,25 +1,28 @@
 #pragma once
 
+#include <QDir>
 #include <QObject>
 #include <QQmlEngine>
 #include <QUrl>
 
 #include "incubator.h"
+#include "qsintercept.h"
+#include "scan.h"
 #include "singleton.h"
 
 namespace wqs {
 
 ///! Owns a QQmlEngine and the loaded config, and drives the reload sequence.
 ///
-/// Upstream's EngineGeneration also carries the file scanner, url interceptor, image providers
-/// and plugin hooks. wqs does not have those yet, so this only covers what the reloadable QML
-/// types need: an engine -> generation lookup, the singleton registry, and the reload signals.
+/// Upstream's EngineGeneration also carries the image providers and plugin hooks. wqs does not
+/// have those yet, so this only covers what the reloadable QML types need: an engine ->
+/// generation lookup, the singleton registry, and the reload signals.
 class EngineGeneration : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit EngineGeneration(QQmlEngine *engine);
+    explicit EngineGeneration(QQmlEngine *engine, const QDir &configRoot);
     ~EngineGeneration() override;
 
     // Loads the entry file as this generation's root and runs the initial reload pass.
@@ -37,8 +40,12 @@ public:
 
     QQmlEngine *engine = nullptr;
     QObject *root = nullptr;
+    QDir rootPath;
+    QmlScanner scanner;
     SingletonRegistry singletonRegistry;
     QsIncubationController incubationController;
+    QsUrlInterceptor urlInterceptor;
+    QsInterceptNetworkAccessManagerFactory interceptNetFactory;
     bool reloadComplete = false;
 
 signals:

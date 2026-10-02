@@ -5,6 +5,7 @@
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QQmlEngine>
+#include <QTimer>
 
 #include "reload.h"
 
@@ -14,20 +15,45 @@ QHash<const QQmlEngine *, wqs::EngineGeneration *> g_generations;
 
 namespace wqs {
 
-EngineGeneration::EngineGeneration(QQmlEngine *engine)
+EngineGeneration::EngineGeneration(QQmlEngine *engine, const QDir &configRoot)
     : QObject(nullptr)
     , engine(engine)
+    , rootPath(configRoot)
+    , scanner(configRoot)
+    , urlInterceptor(configRoot)
+    , interceptNetFactory(configRoot, this->scanner.fileIntercepts)
 {
     g_generations.insert(engine, this);
+
+    // Qt needs a qmldir before it will resolve a module from an import path, but configs drop
+    // .qml files into folders instead of shipping one. Synthesize them up front, since the
+    // network access manager below serves them from memory.
+    this->scanner.scan();
+
     this->engine->setIncubationController(&this->incubationController);
+    this->engine->addUrlInterceptor(&this->urlInterceptor);
+    this->engine->setNetworkAccessManagerFactory(&this->interceptNetFactory);
+
+    // `import qs.foo` resolves to `qs:@/qs/foo`, which the interceptor and network access
+    // manager rewrite into the config directory
+    this->engine->addImportPath(QStringLiteral("qs:@/"));
 
     QObject::connect(this->engine, &QQmlEngine::quit, this, &EngineGeneration::quit);
     QObject::connect(this->engine, &QQmlEngine::exit, this, &EngineGeneration::exit);
 }
 
-void EngineGeneration::quit() { QCoreApplication::quit(); }
+void EngineGeneration::quit()
+{
+    // Qt ignores quit() while no event loop is running, so a config that calls Qt.quit() from
+    // Component.onCompleted would hang forever. Defer to the loop instead, which still exits on
+    // the next iteration when called from within one.
+    QTimer::singleShot(0, qApp, [] { QCoreApplication::quit(); });
+}
 
-void EngineGeneration::exit(int code) { QCoreApplication::exit(code); }
+void EngineGeneration::exit(int code)
+{
+    QTimer::singleShot(0, qApp, [code] { QCoreApplication::exit(code); });
+}
 
 EngineGeneration::~EngineGeneration()
 {
@@ -42,7 +68,14 @@ bool EngineGeneration::load(const QUrl &url)
 
     if (object == nullptr) {
         qCritical().noquote() << "wqs: failed to load" << url.toString() << "-"
-                              << component->errorString().trimmed();
+                              << component->errorString().trimmed()
+                              << "(status " << component->status() << ")";
+
+        // errorString is empty when the failure is only a warning-level issue, so dump the list
+        for (const auto &error: component->errors()) {
+            qCritical().noquote() << "  " << error.toString();
+        }
+
         delete component;
         return false;
     }

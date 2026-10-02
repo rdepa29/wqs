@@ -32,6 +32,10 @@ qt_add_qml_module(quickshell
         src/quickshell/reload.cpp
         src/quickshell/generation.h
         src/quickshell/generation.cpp
+src/quickshell/qsintercept.h
+    src/quickshell/qsintercept.cpp
+    src/quickshell/scan.h
+    src/quickshell/scan.cpp
         src/quickshell/singleton.h
         src/quickshell/singleton.cpp
         src/quickshell/variants.h

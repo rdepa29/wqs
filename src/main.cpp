@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 
     // the generation owns the root object and the reload sequence; Reloadable, Singleton and
     // LazyLoader all find it again by walking up to the engine it is registered against
-    wqs::EngineGeneration generation(&engine);
+    wqs::EngineGeneration generation(&engine, QDir(shellDir));
 
     // control channel for list/kill/ipc
     IpcServer ipc(entry);
