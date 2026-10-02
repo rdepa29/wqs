@@ -135,6 +135,9 @@ works as-is. The following are available under `import Quickshell`:
 - `Singleton` - root component for reloadable singletons
 - `Variants` - creates non-`Item` instances of a component from a `model` list,
   each with `modelData`, and acts as a reload scope
+- `ScriptModel` - list model that diffs a JS array into insert/remove/move/data-change
+  operations, so views animate instead of rebuilding; `values`, `objectProp`,
+  `comparisonMode`
 - `PersistentProperties` - keeps declared properties across a reload
 - `LazyLoader` - asynchronous component loader (`loading` / `active` /
   `activeAsync`, `component` / `source`)
