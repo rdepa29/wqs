@@ -138,6 +138,10 @@ works as-is. The following are available under `import Quickshell`:
 - `ScriptModel` - list model that diffs a JS array into insert/remove/move/data-change
   operations, so views animate instead of rebuilding; `values`, `objectProp`,
   `comparisonMode`
+- `Region` - composable mask region (`shape`, `intersection`, per-corner `radius`),
+  nestable as child regions, used by the window `mask` property
+- `TransformWatcher` - emits `transformChanged` when the geometry of either item,
+  or anything between them in the parent chain, changes
 - `PersistentProperties` - keeps declared properties across a reload
 - `LazyLoader` - asynchronous component loader (`loading` / `active` /
   `activeAsync`, `component` / `source`)
@@ -149,7 +153,8 @@ works as-is. The following are available under `import Quickshell`:
   `relativeX` / `relativeY`, hidden by default
 - `ShellScreen` - one entry from `Quickshell.screens` (name, geometry, scale, ...)
 - value types `panelAnchors`, `panelMargins`, `popupAnchorRect`, and the
-  `Edges` / `ExclusionMode` enums
+  `Edges` / `ExclusionMode` / `RegionShape` / `Intersection` / `ObjectComparison`
+  enums
 
 And under `import Quickshell.Komorebi` (a wqs extension, not upstream Quickshell):
 

@@ -40,6 +40,10 @@ qt_add_qml_module(quickshell
         src/quickshell/singleton.cpp
         src/quickshell/ScriptModel.h
         src/quickshell/ScriptModel.cpp
+        src/quickshell/Region.h
+        src/quickshell/Region.cpp
+        src/quickshell/TransformWatcher.h
+        src/quickshell/TransformWatcher.cpp
         src/quickshell/variants.h
         src/quickshell/variants.cpp
         src/quickshell/persistentprops.h
