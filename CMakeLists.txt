@@ -44,6 +44,12 @@ qt_add_qml_module(quickshell
         src/quickshell/Region.cpp
         src/quickshell/TransformWatcher.h
         src/quickshell/TransformWatcher.cpp
+        src/quickshell/model.h
+        src/quickshell/model.cpp
+        src/quickshell/desktopentry.h
+        src/quickshell/desktopentry.cpp
+        src/quickshell/desktopentrymonitor.h
+        src/quickshell/desktopentrymonitor.cpp
         src/quickshell/variants.h
         src/quickshell/variants.cpp
         src/quickshell/persistentprops.h

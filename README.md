@@ -142,6 +142,17 @@ works as-is. The following are available under `import Quickshell`:
   nestable as child regions, used by the window `mask` property
 - `TransformWatcher` - emits `transformChanged` when the geometry of either item,
   or anything between them in the parent chain, changes
+- `DesktopEntries` - the desktop entry index (a singleton): `applications` (an
+  `ObjectModel<DesktopEntry>` of type `Application` entries that are neither
+  `Hidden` nor `NoDisplay`), `byId(id)` and `heuristicLookup(name)`
+- `DesktopEntry` - one indexed application: `id`, `name`, `genericName`,
+  `startupClass`, `noDisplay`, `comment`, `icon`, `execString`, `command`
+  (`list<string>`, ready to run), `workingDirectory`, `runInTerminal`,
+  `categories`, `keywords`, `actions` (`list<DesktopAction>`), and `execute()`
+- `DesktopAction` - one action of a `DesktopEntry`: `id`, `name`, `icon`,
+  `execString`, `command`, and `execute()`
+- `ObjectModel<T>` - the C++ list model behind `DesktopEntries.applications`;
+  `values`, `rowCount()`, `indexOf()`, plus the data roles used by views
 - `PersistentProperties` - keeps declared properties across a reload
 - `LazyLoader` - asynchronous component loader (`loading` / `active` /
   `activeAsync`, `component` / `source`)
@@ -206,6 +217,16 @@ Deviations from upstream Quickshell are Windows-driven: `PanelWindow` is a
 topmost frameless window rather than a Wayland layer-shell surface, but an
 edge-docked panel still reserves its strip by registering as a Windows app-bar,
 and a few Qt-only helpers (clipboard, theme icons) are present but partial.
+
+`DesktopEntries` follows the same model on Windows with a different backing
+store: because Windows has no `.desktop` files, wqs enumerates the per-user and
+system Start Menu folders under `%APPDATA%` and `%ProgramData%`, recursively,
+and resolves each `.lnk` shortcut through `IShellLinkW` - the shortcut target
+becomes `command`, and its icon location becomes `icon`. Shortcut targets and
+arguments have `%VAR%` references expanded and are split with the Windows
+command-line rules. If `XDG_DATA_HOME` / `XDG_DATA_DIRS` point at a freedesktop
+tree, those `applications` directories are indexed as well and parse the normal
+desktop-entry format.
 
 ### The `qs:` config namespace
 
@@ -303,11 +324,11 @@ The ignore rule lives in komorebi's `applications.json`
 - a widget set (clock, workspaces, tray, media) and a theme language
 - app-bar registration for non-edge `FloatingWindow`s (Windows only docks
   app-bars to an edge, so centered windows cannot reserve space this way)
-- port the Caelestia shell on top of this base: the remaining work is
-  the core types still missing (`SystemClock`, `ElapsedTimer`, `ObjectModel`,
-  `ColorQuantizer`, `Retainable`, `EasingCurve`, `BoundComponent`), desktop-entry
-  types, the Caelestia C++ plugin, and Windows stand-ins for the Linux-only
-  services (UPower, Bluetooth, MPRIS, Pipewire, notifications, global shortcuts)
+- port the Caelestia shell on top of this base: the remaining work is the core
+  types still missing (`SystemClock`, `ElapsedTimer`, `ColorQuantizer`,
+  `Retainable`, `EasingCurve`, `BoundComponent`), the Caelestia C++ plugin, and
+  Windows stand-ins for the Linux-only services (UPower, Bluetooth, MPRIS,
+  Pipewire, notifications, global shortcuts)
   - `Variants.model` currently only accepts a list, not a `QAbstractItemModel`,
     so `ScriptModel` has to be wrapped in a list to be passed to `Variants`
 
